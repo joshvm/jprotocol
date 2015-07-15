@@ -1,0 +1,16 @@
+group 'com.github.joshvm'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.5
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.projectlombok:lombok:1.16.4'
+    compile 'com.io7m.xom:xom:1.2.10'
+    compile 'org.reflections:reflections:0.9.10'
+}
