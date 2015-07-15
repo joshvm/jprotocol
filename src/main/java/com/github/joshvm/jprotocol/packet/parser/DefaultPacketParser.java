@@ -18,7 +18,11 @@ public class DefaultPacketParser implements PacketParser {
             final PacketDefinition definition = protocol.getPacket(buffer.readByte());
             if(definition == null)
                 continue;
-            Optional.ofNullable(definition.in(buffer)).ifPresent(out::add);
+            try{
+                Optional.ofNullable(definition.in(buffer)).ifPresent(out::add);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
