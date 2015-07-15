@@ -1,0 +1,1 @@
+jprotocol is a library used to define packet structure in XML.
