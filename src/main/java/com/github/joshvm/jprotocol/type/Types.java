@@ -19,7 +19,7 @@ public class Types {
         this(types, calculateLength(types));
     }
 
-    public Type get(final int idx){
+    public Type getType(final int idx){
         return types[idx];
     }
 

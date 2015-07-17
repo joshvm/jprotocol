@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class LongType extends Type<Long> {
 
     public static final String NAME = "long";
@@ -16,7 +18,7 @@ public class LongType extends Type<Long> {
         return buffer().putLong(l).array();
     }
 
-    public Long deserialize(final byte[] bytes){
-        return buffer(bytes).getLong();
+    public Long deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getLong();
     }
 }

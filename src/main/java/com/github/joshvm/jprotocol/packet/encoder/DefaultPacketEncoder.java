@@ -15,7 +15,7 @@ public class DefaultPacketEncoder implements PacketEncoder{
             throw new IllegalArgumentException(String.format("Expecting %d args. Received %d", definition.getOut().count(), args.length));
         final WritableBuffer payload = new WritableBuffer();
         for(int i = 0; i < args.length; i++)
-            payload.write(definition.getOut().get(i).serialize(args[i]));
+            payload.write(definition.getOut().getType(i).serialize(args[i]));
         final byte[] payloadBytes = payload.toByteArray();
         final WritableBuffer buffer = new WritableBuffer();
         buffer.writeByte(definition.getOpcode());

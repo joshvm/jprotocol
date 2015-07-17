@@ -4,17 +4,28 @@ import com.github.joshvm.jprotocol.PacketDefinition;
 import com.github.joshvm.jprotocol.packet.Packet;
 import com.github.joshvm.jprotocol.packet.buffer.ReadableBuffer;
 import com.github.joshvm.jprotocol.packet.buffer.WritableBuffer;
-import com.github.joshvm.jprotocol.type.Type;
 import lombok.Getter;
+
+import javax.annotation.Nullable;
 
 public class DefaultPacketDecoder implements PacketDecoder {
 
     @Getter(lazy=true) private static final DefaultPacketDecoder instance = new DefaultPacketDecoder();
 
+    @Nullable
     public Packet<ReadableBuffer> decode(final PacketDefinition definition, final ReadableBuffer in){
+        final int pos = in.position();
+        final Object[] objs = new Object[definition.getIn().count()];
+        for(int i = 0; i < objs.length; i++){
+            objs[i] = in.read(definition.getIn().getType(i));
+            if(objs[i] == null){
+                in.setPosition(pos);
+                return null;
+            }
+        }
         final WritableBuffer out = new WritableBuffer();
-        for(final Type type : definition.getIn().getTypes())
-            out.write(type, in.read(type));
+        for(int i = 0; i < objs.length; i++)
+            out.write(definition.getIn().getType(i), objs[i]);
         return new Packet<>(definition, new ReadableBuffer(out.toByteArray()));
     }
 

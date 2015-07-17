@@ -22,6 +22,16 @@ public class ReadableBuffer implements Buffer{
         buffer = ByteBuffer.wrap(bytes);
     }
 
+    public byte[] remainingBytes(){
+        final byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
+    }
+
+    public int remaining(){
+        return buffer.remaining();
+    }
+
     public ByteBuffer buffer(){
         return buffer;
     }
@@ -34,14 +44,20 @@ public class ReadableBuffer implements Buffer{
         return buffer.hasRemaining();
     }
 
-    public byte[] remaining(){
-        final byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes, buffer.position(), bytes.length);
-        return bytes;
+    public int position(){
+        return buffer.position();
+    }
+
+    public void setPosition(final int position){
+        buffer.position(position);
+    }
+
+    public int size(){
+        return buffer.limit();
     }
 
     public <T> T read(final Type<T> type){
-        return type.deserialize(remaining());
+        return type.deserialize(buffer);
     }
 
     public <T> T read(final String type){

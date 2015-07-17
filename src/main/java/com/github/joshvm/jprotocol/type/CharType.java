@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class CharType extends Type<Character> {
 
     public static final String NAME = "char";
@@ -16,7 +18,7 @@ public class CharType extends Type<Character> {
         return buffer().putChar(c).array();
     }
 
-    public Character deserialize(final byte[] bytes){
-        return buffer(bytes).getChar();
+    public Character deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getChar();
     }
 }

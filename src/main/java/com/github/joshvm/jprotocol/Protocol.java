@@ -3,12 +3,12 @@ package com.github.joshvm.jprotocol;
 import com.github.joshvm.jprotocol.packet.Packet;
 import com.github.joshvm.jprotocol.packet.buffer.ReadableBuffer;
 import com.github.joshvm.jprotocol.packet.buffer.WritableBuffer;
+import com.github.joshvm.jprotocol.packet.decoder.DefaultPacketDecoder;
+import com.github.joshvm.jprotocol.packet.decoder.PacketDecoder;
 import com.github.joshvm.jprotocol.packet.encoder.DefaultPacketEncoder;
 import com.github.joshvm.jprotocol.packet.encoder.PacketEncoder;
 import com.github.joshvm.jprotocol.packet.parser.DefaultPacketParser;
 import com.github.joshvm.jprotocol.packet.parser.PacketParser;
-import com.github.joshvm.jprotocol.packet.decoder.DefaultPacketDecoder;
-import com.github.joshvm.jprotocol.packet.decoder.PacketDecoder;
 import com.github.joshvm.jprotocol.type.Type;
 import lombok.Getter;
 import lombok.ToString;
@@ -24,6 +24,63 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * A protocol consists of several things:
+ *
+ * <ul>
+ *     <li>
+ *         A packet parser: The parser is used to parse the incoming client's read buffer into a collection of {@link Packet} with {@link ReadableBuffer}
+ *     </li>
+ *     <li>
+ *         A packet encoder: The encoder is responsible for taking a variable-length amount of arguments and serializing it (as per structure) to a {@link Packet}s with {@link WritableBuffer}
+ *     </li>
+ *     <li>
+ *         A packet decoder: The decoder is responsible for the deserialization of one {@link PacketDefinition}
+ *     </li>
+ *     <li>
+ *         Packet definitions: A {@link PacketDefinition} is a representation of the underlying structure of a packet.
+ *     </li>
+ * </ul>
+ *
+ * Considering a protocol is loaded from XML; a typical structure might look like:
+ *
+ * <code>
+ *     <protocol>
+ *
+ *         <packet-parser class="path.to.packet.parser"/> <!-- Optional (defaults to {@link DefaultPacketParser})-->
+ *         <packet-encoder class="path.to.packet.encoder"/> <!-- Optional (defaults to {@link DefaultPacketEncoder})-->
+ *         <packet-decoder class="path.to.packet.decoder"/> <!-- Optional (defaults to {@link DefaultPacketDecoder})-->
+ *
+ *         <types> <!-- if you have custom types in your project (optional) -->
+ *             <type class="path.to.my.type"/> <!-- load type from a designated class -->
+ *             <type package="path.to.types"/> <!-- load types from a designated package -->
+ *         </types>
+ *
+ *         <!-- available type names: bool, byte, char, short, int, float, long, double, string -->
+ *
+ *         <packets>
+ *             <packet opcode="0"> <!-- ex: login packet -->
+ *                <in length="-1"> <!-- length should be defined when you have variable-length types -->
+ *                    <type name="string"/> <!-- username -->
+ *                    <type name="string"/> <!-- password -->
+ *                </in>
+ *                <out> <!-- length attribute is optional - defaults to the sum of the length of types -->
+ *                    <type name="byte"/> <!-- response -->
+ *                </out>
+ *                <listeners>
+ *                    <listener class="path.to.login.listener"/>
+ *                </listeners>
+ *             </packet>
+ *             <packet opcode="1"> <!-- ex: response packet -->
+ *                 <out> <!-- in tag not necessary here as this is a send-only packet -->
+ *                     <type name="byte"/>
+ *                     <type name="byte"/>
+ *                 </out>
+ *             </packet>
+ *         </packets>
+ *     </protocol>
+ * </code>
+ */
 @ToString
 public class Protocol {
 

@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class ShortType extends Type<Short> {
 
     public static final String NAME = "short";
@@ -16,7 +18,7 @@ public class ShortType extends Type<Short> {
         return buffer().putShort(s).array();
     }
 
-    public Short deserialize(final byte[] bytes){
-        return buffer(bytes).getShort();
+    public Short deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getShort();
     }
 }

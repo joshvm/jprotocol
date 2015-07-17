@@ -1,5 +1,6 @@
 package com.github.joshvm.jprotocol.type;
 
+import com.github.joshvm.jprotocol.util.Utils;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -8,15 +9,18 @@ import lombok.ToString;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public abstract class Type<T> {
 
+    public static final int UNDEFINED = -10;
     public static final int VAR_BYTE = -1;
     public static final int VAR_SHORT = -2;
     public static final int VAR_INT = -4;
@@ -31,20 +35,34 @@ public abstract class Type<T> {
     @Getter private final int length;
 
     protected ByteBuffer buffer(final int length){
-        return ByteBuffer.allocate(length);
+        return Utils.buffer(length);
     }
 
     protected ByteBuffer buffer(){
-        return buffer(length);
+        return Utils.buffer(length);
     }
 
     protected ByteBuffer buffer(final byte[] bytes){
-        return ByteBuffer.wrap(bytes);
+        return Utils.buffer(bytes);
+    }
+
+    @Nullable
+    protected byte[] readBytes(final ByteBuffer buffer){
+        return Utils.readBytes(buffer, length);
     }
 
     public abstract byte[] serialize(final T obj);
 
-    public abstract T deserialize(final byte[] bytes);
+    @Nullable
+    public T deserialize(final ByteBuffer buffer){
+        return length == UNDEFINED ? deserializeBuffer(buffer) :
+                Optional.ofNullable(Utils.readBytes(buffer, length))
+                .map(ByteBuffer::wrap)
+                .map(this::deserializeBuffer)
+                .orElse(null);
+    }
+
+    protected abstract T deserializeBuffer(final ByteBuffer buffer);
 
     public static int registerPackage(final String packageName){
         return new Reflections(ClasspathHelper.forPackage(packageName)).getSubTypesOf(Type.class).stream()

@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class FloatType extends Type<Float> {
 
     public static final String NAME = "float";
@@ -16,7 +18,7 @@ public class FloatType extends Type<Float> {
         return buffer().putFloat(f).array();
     }
 
-    public Float deserialize(final byte[] bytes){
-        return buffer(bytes).getFloat();
+    public Float deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getFloat();
     }
 }

@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class IntType extends Type<Integer> {
 
     public static final String NAME = "int";
@@ -16,7 +18,7 @@ public class IntType extends Type<Integer> {
         return buffer().putInt(i).array();
     }
 
-    public Integer deserialize(final byte[] bytes){
-        return buffer(bytes).getInt();
+    public Integer deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getInt();
     }
 }

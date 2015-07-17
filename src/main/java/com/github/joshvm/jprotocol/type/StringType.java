@@ -12,7 +12,7 @@ public class StringType extends Type<String> {
     @Getter(lazy=true) private static final StringType instance = new StringType();
 
     public StringType(){
-        super(NAME, VAR_SHORT);
+        super(NAME, UNDEFINED);
     }
 
     public byte[] serialize(final String s){
@@ -24,8 +24,7 @@ public class StringType extends Type<String> {
         return buffer.array();
     }
 
-    public String deserialize(final byte[] bytes){
-        final ByteBuffer buffer = buffer(bytes);
+    public String deserializeBuffer(final ByteBuffer buffer){
         final StringBuilder bldr = new StringBuilder();
         byte b;
         while((b = buffer.get()) != TERMINATOR)

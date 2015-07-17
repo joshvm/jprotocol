@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class DoubleType extends Type<Double> {
 
     public static final String NAME = "double";
@@ -16,7 +18,7 @@ public class DoubleType extends Type<Double> {
         return buffer().putDouble(d).array();
     }
 
-    public Double deserialize(final byte[] bytes){
-        return buffer(bytes).getDouble();
+    public Double deserializeBuffer(final ByteBuffer buffer){
+        return buffer.getDouble();
     }
 }

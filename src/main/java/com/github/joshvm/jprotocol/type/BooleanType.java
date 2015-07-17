@@ -2,6 +2,8 @@ package com.github.joshvm.jprotocol.type;
 
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
+
 public class BooleanType extends Type<Boolean> {
 
     public static final String NAME = "bool";
@@ -16,7 +18,7 @@ public class BooleanType extends Type<Boolean> {
         return buffer().put((byte) (b ? 1 : 0)).array();
     }
 
-    public Boolean deserialize(final byte[] bytes){
-        return buffer(bytes).get() == 1;
+    public Boolean deserializeBuffer(final ByteBuffer buffer){
+        return buffer.get() == 1;
     }
 }
