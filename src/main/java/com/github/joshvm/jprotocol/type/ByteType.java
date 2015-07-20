@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 8-bit (1 byte) {@link Byte} type
+ */
 public class ByteType extends Type<Byte> {
 
     public static final String NAME = "byte";

@@ -4,6 +4,11 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a single bit {@link Boolean} type. This is equivalent to the {@link ByteType} in a sense that
+ * if the value is {@code true} it uses a 1 otherwise a 0.
+ */
 public class BooleanType extends Type<Boolean> {
 
     public static final String NAME = "bool";

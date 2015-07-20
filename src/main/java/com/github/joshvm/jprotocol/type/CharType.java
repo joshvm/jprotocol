@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 16-bit (2 byte) {@link Character} type
+ */
 public class CharType extends Type<Character> {
 
     public static final String NAME = "char";

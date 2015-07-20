@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 64-bit (8 byte) {@link Double} type
+ */
 public class DoubleType extends Type<Double> {
 
     public static final String NAME = "double";

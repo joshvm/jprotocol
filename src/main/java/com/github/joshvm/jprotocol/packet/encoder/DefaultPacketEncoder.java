@@ -6,10 +6,17 @@ import com.github.joshvm.jprotocol.packet.buffer.WritableBuffer;
 import com.github.joshvm.jprotocol.type.Type;
 import lombok.Getter;
 
+/**
+ * {@inheritDoc}
+ * The default implementation for packet encoding if there is not one provided in the XML.
+ */
 public class DefaultPacketEncoder implements PacketEncoder{
 
     @Getter(lazy=true) private static final DefaultPacketEncoder instance = new DefaultPacketEncoder();
 
+    /**
+     * {@inheritDoc}
+     */
     public Packet<WritableBuffer> encode(final PacketDefinition definition, final Object... args){
         if(args.length != definition.getOut().count())
             throw new IllegalArgumentException(String.format("Expecting %d args. Received %d", definition.getOut().count(), args.length));

@@ -15,6 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ *
+ * This class represents a single data type that a {@link com.github.joshvm.jprotocol.PacketDefinition} can consist of.
+ * It is also a representation as a type that can be serialized and deserialized.
+ * Serialization refers to the process of converting an object of some generic type to a byte array.
+ * Deserialization refers to the process of converting a byte array to an object of some generic type.
+ *
+ */
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
@@ -34,25 +42,65 @@ public abstract class Type<T> {
     @Getter @NonNull private final String name;
     @Getter private final int length;
 
+    /**
+     *
+     * This method is exactly the same as {@code Utils.buffer(length)}
+     *
+     * @param length the length (or capacity) of the {@link ByteBuffer}
+     * @return the {@link ByteBuffer} that has a capacity of {@code length}
+     */
     protected ByteBuffer buffer(final int length){
         return Utils.buffer(length);
     }
 
+    /**
+     *
+     * This method is exactly the same as {@code buffer(getLength())} or {@code Utils.buffer(length)}
+     *
+     * @return the {@link ByteBuffer} that has the capacity of the length
+     */
     protected ByteBuffer buffer(){
         return Utils.buffer(length);
     }
 
+    /**
+     *
+     * This method is exactly the same as {@code Utils.buffer(bytes)}
+     *
+     * @param bytes the byte array
+     * @return the wrapped {@link ByteBuffer} that is wrapping the provided bytes
+     */
     protected ByteBuffer buffer(final byte[] bytes){
         return Utils.buffer(bytes);
     }
 
+    /**
+     *
+     * This method is shorthand for {@code Utils.readBytes(buffer, getLength())}.
+     * This method can return {@code null} if there are insufficient bytes in the buffer
+     *
+     * @param buffer the {@link ByteBuffer} to be read from
+     * @return the byte array if there are enough bytes, {@code null} if there are not
+     */
     @Nullable
     protected byte[] readBytes(final ByteBuffer buffer){
         return Utils.readBytes(buffer, length);
     }
 
+    /**
+     *
+     * @param obj the object to be serialized
+     * @return the serialized byte array
+     */
     public abstract byte[] serialize(final T obj);
 
+    /**
+     *
+     * This method can return {@code null} if there are insufficient bytes in the buffer.
+     *
+     * @param buffer the {@link ByteBuffer}
+     * @return the deserialized object if there is enough bytes in the buffer, otherwise {@code null}
+     */
     @Nullable
     public T deserialize(final ByteBuffer buffer){
         return length == UNDEFINED ? deserializeBuffer(buffer) :
@@ -62,8 +110,21 @@ public abstract class Type<T> {
                 .orElse(null);
     }
 
+    /**
+     *
+     * This method shouldn't return null considering that this method is called with a {@link ByteBuffer} that
+     * has enough bytes to deserialize the object
+     *
+     * @param buffer the {@link ByteBuffer}
+     * @return the object serialized from the buffer
+     */
     protected abstract T deserializeBuffer(final ByteBuffer buffer);
 
+    /**
+     *
+     * @param packageName the name of the package containing the {@link Type}s
+     * @return the number of types registered from the given package
+     */
     public static int registerPackage(final String packageName){
         return new Reflections(ClasspathHelper.forPackage(packageName)).getSubTypesOf(Type.class).stream()
                 .mapToInt(c -> {
@@ -76,6 +137,11 @@ public abstract class Type<T> {
                 .sum();
     }
 
+    /**
+     *
+     * @param clazz the {@link Type} class
+     * @return {@code true} if the class was successfully registered, {@code false} otherwise
+     */
     public static boolean registerClass(final Class<? extends Type> clazz){
         try{
             register(clazz.newInstance());
@@ -86,6 +152,13 @@ public abstract class Type<T> {
         }
     }
 
+    /**
+     *
+     * This method is equivalent to {@code registerClass(Class.forName(typeClass))}
+     *
+     * @param typeClass the fully qualified name of the {@link Type} class
+     * @return {@code true} if the class was successfully registered, {@code false} otherwise
+     */
     public static boolean registerClass(final String typeClass){
         try{
             return registerClass((Class<? extends Type>)Class.forName(typeClass));
@@ -95,14 +168,32 @@ public abstract class Type<T> {
         }
     }
 
+    /**
+     *
+     * This method maps the {@link Type} to an underlying {@link Map} by the name.
+     * This means that if 2 types have the same name, the type that was registered last will be the one used.
+     *
+     * @param type the {@link Type} to be added
+     */
     public static void register(final Type type){
         MAP.put(type.getName(), type);
     }
 
+    /**
+     *
+     * @param type the {@link Type} to be removed
+     */
     public static void unregister(final Type type){
         MAP.remove(type.getName());
     }
 
+    /**
+     *
+     * @param name the name of the {@link Type}
+     * @param <V> generic type
+     * @return the {@link Type} that matches the provided name, {@code null} otherwise
+     */
+    @Nullable
     public static <V> Type<V> get(final String name){
         return MAP.get(name);
     }

@@ -14,6 +14,10 @@ import lombok.NonNull;
 
 import java.nio.ByteBuffer;
 
+/**
+ * This class represents an underlying byte array (a buffer) used to read {@link Type}s (deserialization buffer).
+ * This class contains several readXXX() methods designed to deserialize the underlying buffer into defined types.
+ */
 public class ReadableBuffer implements Buffer{
 
     @NonNull private final ByteBuffer buffer;

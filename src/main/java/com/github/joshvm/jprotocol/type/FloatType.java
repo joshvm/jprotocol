@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 32-bit (4 byte) {@link Float} type
+ */
 public class FloatType extends Type<Float> {
 
     public static final String NAME = "float";

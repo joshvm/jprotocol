@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 64-bit (8 byte) {@link Long} type
+ */
 public class LongType extends Type<Long> {
 
     public static final String NAME = "long";

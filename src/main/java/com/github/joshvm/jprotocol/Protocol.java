@@ -1,6 +1,5 @@
 package com.github.joshvm.jprotocol;
 
-import com.github.joshvm.jprotocol.packet.Packet;
 import com.github.joshvm.jprotocol.packet.buffer.ReadableBuffer;
 import com.github.joshvm.jprotocol.packet.buffer.WritableBuffer;
 import com.github.joshvm.jprotocol.packet.decoder.DefaultPacketDecoder;
@@ -16,6 +15,7 @@ import nu.xom.Builder;
 import nu.xom.Element;
 import nu.xom.Elements;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
@@ -29,10 +29,10 @@ import java.util.Optional;
  *
  * <ul>
  *     <li>
- *         A packet parser: The parser is used to parse the incoming client's read buffer into a collection of {@link Packet} with {@link ReadableBuffer}
+ *         A packet parser: The parser is used to parse the incoming client's read buffer into a collection of {@link com.github.joshvm.jprotocol.packet.Packet} with {@link ReadableBuffer}
  *     </li>
  *     <li>
- *         A packet encoder: The encoder is responsible for taking a variable-length amount of arguments and serializing it (as per structure) to a {@link Packet}s with {@link WritableBuffer}
+ *         A packet encoder: The encoder is responsible for taking a variable-length amount of arguments and serializing it (as per structure) to a {@link com.github.joshvm.jprotocol.packet.Packet}s with {@link WritableBuffer}
  *     </li>
  *     <li>
  *         A packet decoder: The decoder is responsible for the deserialization of one {@link PacketDefinition}
@@ -44,12 +44,13 @@ import java.util.Optional;
  *
  * Considering a protocol is loaded from XML; a typical structure might look like:
  *
- * <code>
+ * <pre>
+ *     {@code
  *     <protocol>
  *
- *         <packet-parser class="path.to.packet.parser"/> <!-- Optional (defaults to {@link DefaultPacketParser})-->
- *         <packet-encoder class="path.to.packet.encoder"/> <!-- Optional (defaults to {@link DefaultPacketEncoder})-->
- *         <packet-decoder class="path.to.packet.decoder"/> <!-- Optional (defaults to {@link DefaultPacketDecoder})-->
+ *         <packet-parser class="path.to.packet.parser"/> <!-- Optional (defaults to DefaultPacketParser)-->
+ *         <packet-encoder class="path.to.packet.encoder"/> <!-- Optional (defaults to DefaultPacketEncoder)-->
+ *         <packet-decoder class="path.to.packet.decoder"/> <!-- Optional (defaults to DefaultPacketDecoder)-->
  *
  *         <types> <!-- if you have custom types in your project (optional) -->
  *             <type class="path.to.my.type"/> <!-- load type from a designated class -->
@@ -60,7 +61,7 @@ import java.util.Optional;
  *
  *         <packets>
  *             <packet opcode="0"> <!-- ex: login packet -->
- *                <in length="-1"> <!-- length should be defined when you have variable-length types -->
+ *                <in length="var_byte"> <!-- length should be defined when you have variable-length types -->
  *                    <type name="string"/> <!-- username -->
  *                    <type name="string"/> <!-- password -->
  *                </in>
@@ -79,7 +80,17 @@ import java.util.Optional;
  *             </packet>
  *         </packets>
  *     </protocol>
- * </code>
+ *     }
+ * </pre>
+ *
+ * @see Type
+ * @see PacketParser
+ * @see DefaultPacketParser
+ * @see PacketEncoder
+ * @see DefaultPacketEncoder
+ * @see PacketDecoder
+ * @see DefaultPacketDecoder
+ * @see PacketDefinition
  */
 @ToString
 public class Protocol {
@@ -89,6 +100,12 @@ public class Protocol {
     @Getter private final PacketEncoder packetEncoder;
     @Getter private final PacketDecoder packetDecoder;
 
+    /**
+     *
+     * @param packetParser the {@link PacketParser}
+     * @param packetEncoder the {@link PacketEncoder}
+     * @param packetDecoder the {@link PacketDecoder}
+     */
     protected Protocol(final PacketParser packetParser, final PacketEncoder packetEncoder, final PacketDecoder packetDecoder){
         this.packetParser = packetParser;
         this.packetEncoder = packetEncoder;
@@ -97,52 +114,127 @@ public class Protocol {
         packets = new LinkedHashMap<>();
     }
 
+    /**
+     *
+     * This method maps the packet definition by opcode to the underlying map
+     *
+     * @param pkt the packet definition to add to this protocol
+     */
     public void addPacket(final PacketDefinition pkt){
         packets.put(pkt.getOpcode(), pkt);
     }
 
+    /**
+     *
+     * This method removes the packet definition by opcode to the underlying map
+     *
+     * @param pkt the packet definition to remove from this protocol
+     */
     public void removePacket(final PacketDefinition pkt){
         packets.remove(pkt.getOpcode());
     }
 
-    public Collection<PacketDefinition> listPackets(){
+    /**
+     *
+     * This method returns all of the {@link PacketDefinition}s in the same order as they were inserted
+     *
+     * @return a collection of {@link PacketDefinition}s
+     */
+    public Collection<PacketDefinition> collectPackets(){
         return packets.values();
     }
 
+    /**
+     *
+     * @param opcode the opcode of the {@link PacketDefinition}
+     * @param defPkt the default {@link PacketDefinition} if there is no defined {@link PacketDefinition} with the provided opcode
+     * @return the {@link PacketDefinition}
+     */
     public PacketDefinition getPacket(final int opcode, final PacketDefinition defPkt){
         return packets.getOrDefault(opcode, defPkt);
     }
 
+    /**
+     *
+     * @param opcode the opcode of the {@link PacketDefinition}
+     * @return the {@link PacketDefinition}
+     */
     public PacketDefinition getPacket(final int opcode){
         return packets.get(opcode);
     }
 
-    public Packet<WritableBuffer> out(final int opcode, final Object... args){
+    /**
+     *
+     * This method is equivalent to {@code getPacket(opcode).out(args)}
+     *
+     * @param opcode the opcode of the {@link PacketDefinition}
+     * @param args the variable-length arguments - must be the same length as the number of out types
+     * @return the ready to send encoded {@link com.github.joshvm.jprotocol.packet.Packet}
+     */
+    public com.github.joshvm.jprotocol.packet.Packet out(final int opcode, final Object... args){
         return getPacket(opcode).out(args);
     }
 
-    public Packet<ReadableBuffer> in(final int opcode, final ReadableBuffer buffer){
+    /**
+     *
+     * This method is equivalent to {@code getPacket(opcode).in(buffer)}
+     *
+     * @param opcode the opcode of the {@link PacketDefinition}
+     * @param buffer the incoming client buffer
+     * @return the {@link com.github.joshvm.jprotocol.packet.Packet} if there are sufficient bytes otherwise {@code null}
+     */
+    @Nullable
+    public com.github.joshvm.jprotocol.packet.Packet in(final int opcode, final ReadableBuffer buffer){
         return getPacket(opcode).in(buffer);
     }
 
+    /**
+     *
+     * @param from you should include some unique identifier here to represent the client (ex: with netty, you'd use ChannelHandlerContext)
+     * @param bytes the incoming client's read buffer
+     * @param <T> the generic type representing the sender (client)
+     */
     public <T> void read(final T from, final byte[] bytes){
         packetParser.parse(this, new ReadableBuffer(bytes)).forEach(
                 p -> p.getDefinition().fireOnPacket(from, p)
         );
     }
 
+    /**
+     *
+     * @param is the {@link InputStream} to be parsed
+     * @return the {@link Protocol} parsed from the given {@link InputStream}
+     * @throws Exception if there is an error parsing the {@link InputStream}
+     */
     public static Protocol from(final InputStream is) throws Exception{
         return parse(new Builder().build(is).getRootElement());
     }
 
+    /**
+     *
+     * @param file the {@link File} to be parsed
+     * @return the {@link Protocol} parsed from the given {@link File}
+     * @throws Exception if there is an error parsing the {@link File}
+     */
     public static Protocol from(final File file) throws Exception{
         return parse(new Builder().build(file).getRootElement());
     }
 
+    /**
+     *
+     * @param reader the {@link Reader} to be parsed
+     * @return the {@link Protocol} parsed from the given {@link Reader}
+     * @throws Exception if there an error parsing the {@link Reader}
+     */
     public static Protocol from(final Reader reader) throws Exception{
         return parse(new Builder().build(reader).getRootElement());
     }
 
+    /**
+     *
+     * @param e the {@code protocol} root {@link Element}
+     * @return the parsed {@link Protocol}
+     */
     private static Protocol parse(final Element e){
         Optional.ofNullable(e.getFirstChildElement("types"))
                 .map(t -> t.getChildElements("type"))

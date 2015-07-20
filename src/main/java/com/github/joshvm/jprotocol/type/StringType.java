@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a {@code String} type
+ */
 public class StringType extends Type<String> {
 
     public static final String NAME = "string";
@@ -15,16 +19,20 @@ public class StringType extends Type<String> {
         super(NAME, UNDEFINED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public byte[] serialize(final String s){
         final ByteBuffer buffer = buffer();
-        s.chars().forEach(
-                c -> buffer.put((byte)c)
-        );
+        s.chars().forEach(c -> buffer.put((byte)c));
         buffer.put(TERMINATOR);
         return buffer.array();
     }
 
-    public String deserializeBuffer(final ByteBuffer buffer){
+    /**
+     * {@inheritDoc}
+     */
+    protected String deserializeBuffer(final ByteBuffer buffer){
         final StringBuilder bldr = new StringBuilder();
         byte b;
         while((b = buffer.get()) != TERMINATOR)

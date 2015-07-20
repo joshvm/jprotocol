@@ -14,6 +14,10 @@ import lombok.SneakyThrows;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
+/**
+ * This class is responsible for writing {@link Type}s (serialization).
+ * This class contains several writeXXX methods designed to serialize {@link Type}s into bytes.
+ */
 public class WritableBuffer implements Buffer{
 
     private final DataOutputStream dos;

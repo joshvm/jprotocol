@@ -4,6 +4,10 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+ * {@inheritDoc}
+ * Represents a 32-bit (4 byte) {@link Integer} type
+ */
 public class IntType extends Type<Integer> {
 
     public static final String NAME = "int";

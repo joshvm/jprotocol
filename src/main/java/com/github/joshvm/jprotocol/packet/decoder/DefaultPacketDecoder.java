@@ -8,10 +8,17 @@ import lombok.Getter;
 
 import javax.annotation.Nullable;
 
+/**
+ * {@inheritDoc}
+ * The default implementation of packet decoding if there is not one provided in the XML.
+ */
 public class DefaultPacketDecoder implements PacketDecoder {
 
     @Getter(lazy=true) private static final DefaultPacketDecoder instance = new DefaultPacketDecoder();
 
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     public Packet<ReadableBuffer> decode(final PacketDefinition definition, final ReadableBuffer in){
         final int pos = in.position();
