@@ -18,7 +18,7 @@ public class ByteType extends Type<Byte> {
         super(NAME, 1);
     }
 
-    public byte[] serialize(final Byte b){
+    public byte[] serializeObject(final Byte b){
         return buffer().put(b).array();
     }
 

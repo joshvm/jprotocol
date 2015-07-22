@@ -18,7 +18,7 @@ public class FloatType extends Type<Float> {
         super(NAME, 4);
     }
 
-    public byte[] serialize(final Float f){
+    public byte[] serializeObject(final Float f){
         return buffer().putFloat(f).array();
     }
 

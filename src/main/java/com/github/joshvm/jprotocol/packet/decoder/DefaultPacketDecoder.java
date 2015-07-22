@@ -21,14 +21,11 @@ public class DefaultPacketDecoder implements PacketDecoder {
      */
     @Nullable
     public Packet<ReadableBuffer> decode(final PacketDefinition definition, final ReadableBuffer in){
-        final int pos = in.position();
         final Object[] objs = new Object[definition.getIn().count()];
         for(int i = 0; i < objs.length; i++){
             objs[i] = in.read(definition.getIn().getType(i));
-            if(objs[i] == null){
-                in.setPosition(pos);
+            if(objs[i] == null)
                 return null;
-            }
         }
         final WritableBuffer out = new WritableBuffer();
         for(int i = 0; i < objs.length; i++)

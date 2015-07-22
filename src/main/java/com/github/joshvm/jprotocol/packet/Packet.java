@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 /**
  *
  * This class represents a single packet associated with a {@link PacketDefinition}.
@@ -20,7 +23,19 @@ public class Packet<B extends Buffer> {
     @NonNull @Getter private final PacketDefinition definition;
     @NonNull @Getter private final B buffer;
 
+    public byte[] toByteArray(){
+        return buffer.toByteArray();
+    }
+
     public B buffer(){
         return getBuffer();
+    }
+
+    public <T> T buffer(final Function<B, T> func){
+        return func.apply(buffer);
+    }
+
+    public void withBuffer(final Consumer<B> consumer){
+        consumer.accept(buffer);
     }
 }

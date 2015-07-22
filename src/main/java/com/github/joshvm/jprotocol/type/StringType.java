@@ -22,8 +22,8 @@ public class StringType extends Type<String> {
     /**
      * {@inheritDoc}
      */
-    public byte[] serialize(final String s){
-        final ByteBuffer buffer = buffer();
+    public byte[] serializeObject(final String s){
+        final ByteBuffer buffer = buffer(s.length() + 1);
         s.chars().forEach(c -> buffer.put((byte)c));
         buffer.put(TERMINATOR);
         return buffer.array();
@@ -32,7 +32,7 @@ public class StringType extends Type<String> {
     /**
      * {@inheritDoc}
      */
-    protected String deserializeBuffer(final ByteBuffer buffer){
+    public String deserializeBuffer(final ByteBuffer buffer){
         final StringBuilder bldr = new StringBuilder();
         byte b;
         while((b = buffer.get()) != TERMINATOR)

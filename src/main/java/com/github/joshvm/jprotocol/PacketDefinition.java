@@ -98,6 +98,7 @@ public class PacketDefinition {
 
     @Getter private final Protocol protocol;
     @Getter private final int opcode;
+    @Getter private final String name;
     @Getter private final Types in;
     @Getter private final Types out;
     @Getter private final List<PacketListener> listeners;
@@ -137,7 +138,7 @@ public class PacketDefinition {
      * @param <T> the generic type representing the sender (client)
      */
     public <T> void fireOnPacket(final T from, final Packet<ReadableBuffer> pkt){
-        listeners.forEach(l -> l.onPacket(from, pkt));
+        listeners.forEach(l -> l.onPacket(protocol, from, pkt));
     }
 
     /**
@@ -148,9 +149,10 @@ public class PacketDefinition {
      */
     protected static PacketDefinition parse(final Protocol protocol, final Element e){
         final int opcode = Integer.parseInt(e.getAttributeValue("opcode"));
+        final String name = Optional.ofNullable(e.getAttributeValue("name")).orElse(Integer.toString(opcode));
         final Types in = TypesParser.parse(e, "in");
         final Types out = TypesParser.parse(e, "out");
         final List<PacketListener> listeners = ListenersParser.parse(e);
-        return new PacketDefinition(protocol, opcode, in, out, listeners);
+        return new PacketDefinition(protocol, opcode, name, in, out, listeners);
     }
 }

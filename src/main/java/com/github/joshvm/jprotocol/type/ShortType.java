@@ -21,7 +21,7 @@ public class ShortType extends Type<Short> {
     /**
      * {@inheritDoc}
      */
-    public byte[] serialize(final Short s){
+    public byte[] serializeObject(final Short s){
         return buffer().putShort(s).array();
     }
 

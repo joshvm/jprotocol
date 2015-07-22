@@ -18,7 +18,7 @@ public class CharType extends Type<Character> {
         super(NAME, 2);
     }
 
-    public byte[] serialize(final Character c){
+    public byte[] serializeObject(final Character c){
         return buffer().putChar(c).array();
     }
 

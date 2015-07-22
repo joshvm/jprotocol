@@ -18,7 +18,7 @@ public class DoubleType extends Type<Double> {
         super(NAME, 8);
     }
 
-    public byte[] serialize(final Double d){
+    public byte[] serializeObject(final Double d){
         return buffer().putDouble(d).array();
     }
 

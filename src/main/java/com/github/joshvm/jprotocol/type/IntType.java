@@ -18,7 +18,7 @@ public class IntType extends Type<Integer> {
         super(NAME, 4);
     }
 
-    public byte[] serialize(final Integer i){
+    public byte[] serializeObject(final Integer i){
         return buffer().putInt(i).array();
     }
 

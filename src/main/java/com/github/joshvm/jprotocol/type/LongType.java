@@ -18,7 +18,7 @@ public class LongType extends Type<Long> {
         super(NAME, 8);
     }
 
-    public byte[] serialize(final Long l){
+    public byte[] serializeObject(final Long l){
         return buffer().putLong(l).array();
     }
 

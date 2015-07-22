@@ -1,5 +1,6 @@
 package com.github.joshvm.jprotocol;
 
+import com.github.joshvm.jprotocol.packet.Packet;
 import com.github.joshvm.jprotocol.packet.buffer.ReadableBuffer;
 import com.github.joshvm.jprotocol.packet.buffer.WritableBuffer;
 import com.github.joshvm.jprotocol.packet.decoder.DefaultPacketDecoder;
@@ -96,6 +97,7 @@ import java.util.Optional;
 public class Protocol {
 
     @Getter private final Map<Integer, PacketDefinition> packets;
+    @Getter private final Map<String, PacketDefinition> namedPackets;
     @Getter private final PacketParser packetParser;
     @Getter private final PacketEncoder packetEncoder;
     @Getter private final PacketDecoder packetDecoder;
@@ -112,6 +114,7 @@ public class Protocol {
         this.packetDecoder = packetDecoder;
 
         packets = new LinkedHashMap<>();
+        namedPackets = new LinkedHashMap<>();
     }
 
     /**
@@ -122,6 +125,7 @@ public class Protocol {
      */
     public void addPacket(final PacketDefinition pkt){
         packets.put(pkt.getOpcode(), pkt);
+        namedPackets.put(pkt.getName(), pkt);
     }
 
     /**
@@ -132,6 +136,7 @@ public class Protocol {
      */
     public void removePacket(final PacketDefinition pkt){
         packets.remove(pkt.getOpcode());
+        namedPackets.remove(pkt.getName());
     }
 
     /**
@@ -147,16 +152,6 @@ public class Protocol {
     /**
      *
      * @param opcode the opcode of the {@link PacketDefinition}
-     * @param defPkt the default {@link PacketDefinition} if there is no defined {@link PacketDefinition} with the provided opcode
-     * @return the {@link PacketDefinition}
-     */
-    public PacketDefinition getPacket(final int opcode, final PacketDefinition defPkt){
-        return packets.getOrDefault(opcode, defPkt);
-    }
-
-    /**
-     *
-     * @param opcode the opcode of the {@link PacketDefinition}
      * @return the {@link PacketDefinition}
      */
     public PacketDefinition getPacket(final int opcode){
@@ -165,14 +160,35 @@ public class Protocol {
 
     /**
      *
+     * @param name the name of the {@link PacketDefinition}
+     * @return the {@link PacketDefinition}
+     */
+    public PacketDefinition getPacket(final String name){
+        return namedPackets.get(name);
+    }
+
+    /**
+     *
      * This method is equivalent to {@code getPacket(opcode).out(args)}
      *
      * @param opcode the opcode of the {@link PacketDefinition}
      * @param args the variable-length arguments - must be the same length as the number of out types
-     * @return the ready to send encoded {@link com.github.joshvm.jprotocol.packet.Packet}
+     * @return the ready to send encoded {@link Packet}
      */
-    public com.github.joshvm.jprotocol.packet.Packet out(final int opcode, final Object... args){
+    public Packet<WritableBuffer> out(final int opcode, final Object... args){
         return getPacket(opcode).out(args);
+    }
+
+    /**
+     *
+     * This method is equivalent to {@code getPacket(name).out(args)}
+     *
+     * @param name the name of the {@link PacketDefinition}
+     * @param args the variable-length arguments - must be the same length as the number of out types
+     * @return the ready to send encoded {@link Packet}
+     */
+    public Packet<WritableBuffer> out(final String name, final Object... args){
+        return getPacket(name).out(args);
     }
 
     /**
@@ -181,11 +197,25 @@ public class Protocol {
      *
      * @param opcode the opcode of the {@link PacketDefinition}
      * @param buffer the incoming client buffer
-     * @return the {@link com.github.joshvm.jprotocol.packet.Packet} if there are sufficient bytes otherwise {@code null}
+     * @return the {@link Packet} if there are sufficient bytes otherwise {@code null}
      */
     @Nullable
-    public com.github.joshvm.jprotocol.packet.Packet in(final int opcode, final ReadableBuffer buffer){
+    public Packet<ReadableBuffer> in(final int opcode, final ReadableBuffer buffer){
         return getPacket(opcode).in(buffer);
+    }
+
+
+    /**
+     *
+     * This method is equivalent to {@code getPacket(name).in(buffer)}
+     *
+     * @param name the name of the {@link PacketDefinition}
+     * @param buffer the incoming client buffer
+     * @return the {@link Packet} if there are sufficient bytes otherwise {@code null}
+     */
+    @Nullable
+    public Packet<ReadableBuffer> in(final String name, final ReadableBuffer buffer){
+        return getPacket(name).in(buffer);
     }
 
     /**

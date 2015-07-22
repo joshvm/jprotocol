@@ -1,0 +1,52 @@
+<protocol>
+
+    <types>
+        <type class="common.UserType"/>
+    </types>
+
+    <packets>
+        <packet opcode="0" name="init">
+            <out>
+                <type name="int" desc="id"/>
+            </out>
+        </packet>
+
+        <packet opcode="1" name="join">
+            <out length="var_byte">
+                <type name="user" desc="user"/>
+                <type name="bool" desc="include message"/>
+            </out>
+        </packet>
+
+        <packet opcode="2" name="leave">
+            <out>
+                <type name="int" desc="id"/>
+            </out>
+        </packet>
+
+        <packet opcode="3" name="message">
+            <out length="var_short">
+                <type name="int" desc="id"/>
+                <type name="string" desc="msg"/>
+            </out>
+            <in length="var_short">
+                <type name="string" desc="msg"/>
+            </in>
+            <listeners>
+                <listener class="server.MessageListener"/>
+            </listeners>
+        </packet>
+
+        <packet opcode="4" name="change name">
+            <out length="var_byte">
+                <type name="user" desc="user"/>
+            </out>
+            <in length="var_byte">
+                <type name="string" desc="name"/>
+            </in>
+            <listeners>
+                <listener class="server.ChangeNameListener"/>
+            </listeners>
+        </packet>
+    </packets>
+</protocol>

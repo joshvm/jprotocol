@@ -89,13 +89,6 @@ public abstract class Type<T> {
 
     /**
      *
-     * @param obj the object to be serialized
-     * @return the serialized byte array
-     */
-    public abstract byte[] serialize(final T obj);
-
-    /**
-     *
      * This method can return {@code null} if there are insufficient bytes in the buffer.
      *
      * @param buffer the {@link ByteBuffer}
@@ -112,13 +105,50 @@ public abstract class Type<T> {
 
     /**
      *
+     * This method differs from {@link Type#serializeObject(Object)} because this method includes the variable lengths (if one is available).
+     *
+     * @param obj the object to be serialized
+     * @return the serialized bytes
+     */
+    public byte[] serialize(final T obj){
+        final byte[] bytes = serializeObject(obj);
+        if(length >= 0 || length == UNDEFINED)
+            return bytes;
+        final ByteBuffer buffer = Utils.buffer(Math.abs(length) + bytes.length);
+        switch(length){
+            case Type.VAR_BYTE:
+                buffer.put((byte)bytes.length);
+                break;
+            case Type.VAR_SHORT:
+                buffer.putShort((short)bytes.length);
+                break;
+            case Type.VAR_INT:
+                buffer.putInt(bytes.length);
+                break;
+        }
+        buffer.put(bytes);
+        return buffer.array();
+    }
+
+    /**
+     *
      * This method shouldn't return null considering that this method is called with a {@link ByteBuffer} that
      * has enough bytes to deserialize the object
      *
      * @param buffer the {@link ByteBuffer}
      * @return the object serialized from the buffer
      */
-    protected abstract T deserializeBuffer(final ByteBuffer buffer);
+    public abstract T deserializeBuffer(final ByteBuffer buffer);
+
+    /**
+     *
+     * This method is called by {@link Type#serialize(Object)} - this method represents only the payload.
+     * The {@link Type#serialize(Object)} method includes the length as well.
+     *
+     * @param obj the object to be serialized
+     * @return the serialized byte array
+     */
+    public abstract byte[] serializeObject(final T obj);
 
     /**
      *

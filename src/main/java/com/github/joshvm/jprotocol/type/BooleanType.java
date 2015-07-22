@@ -19,7 +19,7 @@ public class BooleanType extends Type<Boolean> {
         super(NAME, 1);
     }
 
-    public byte[] serialize(final Boolean b){
+    public byte[] serializeObject(final Boolean b){
         return buffer().put((byte) (b ? 1 : 0)).array();
     }
 
